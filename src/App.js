@@ -1,20 +1,16 @@
 import React from 'react';
 import { Route, BrowserRouter, Switch } from 'react-router-dom/cjs/react-router-dom.min';
-
 import './App.css';
+import Home from './pages/Home';
+import ShoppingCart from './ShoppingCart';
 
 class App extends React.Component {
   render() {
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path="/">
-            <div>
-              <p data-testid="home-initial-message">
-                Digite algum termo de pesquisa ou escolha uma categoria.
-              </p>
-            </div>
-          </Route>
+          <Route exact path="/" component={ Home } />
+          <Route path="/shoppingcart" component={ ShoppingCart } />
         </Switch>
       </BrowserRouter>
     );
