@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { getCategories } from '../services/api';
+import PropTypes from 'prop-types';
+import CardProd from '../components/CardProd';
+import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 
 export default class Home extends Component {
   constructor() {
@@ -7,7 +9,14 @@ export default class Home extends Component {
 
     this.state = {
       categoryList: [],
+      campoDeBusca: '',
+      notFoundProduct: false,
+      productList: [],
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.getProducts = this.getProducts.bind(this);
+    this.checkReturnAPI = this.checkReturnAPI.bind(this);
   }
 
   componentDidMount() {
@@ -24,8 +33,40 @@ export default class Home extends Component {
     history.push('/ShoppingCart');
   }
 
+  handleChange({ target }) {
+    this.setState({
+      [target.name]: target.value,
+    });
+  }
+
+  getProducts = async () => {
+    const { campoDeBusca } = this.state;
+
+    await getProductsFromCategoryAndQuery('$CATEGORY_ID', campoDeBusca)
+      .then((prod) => {
+        this.setState({
+          productList: prod,
+        });
+      });
+
+    this.checkReturnAPI();
+  }
+
+  checkReturnAPI() {
+    const { productList } = this.state;
+    if (productList.length === 0) {
+      this.setState({
+        notFoundProduct: true,
+      });
+    } else {
+      this.setState({
+        notFoundProduct: false,
+      });
+    }
+  }
+
   render() {
-    const { categoryList } = this.state;
+    const { categoryList, campoDeBusca, notFoundProduct, productList } = this.state;
 
     return (
       <div>
@@ -41,6 +82,23 @@ export default class Home extends Component {
         >
           Carrinho de compras
         </button>
+
+        <input
+          data-testid="query-input"
+          type="text"
+          name="campoDeBusca"
+          value={ campoDeBusca }
+          onChange={ this.handleChange }
+        />
+
+        <button
+          data-testid="query-button"
+          type="button"
+          onClick={ this.getProducts }
+        >
+          Buscar
+        </button>
+
         <div>
           <span>Categorias:</span>
           {categoryList
@@ -65,7 +123,30 @@ export default class Home extends Component {
               </ul>
             ))}
         </div>
+        {notFoundProduct ? (
+          <span>Nenhum produto foi encontrado</span>
+        ) : (
+          productList
+            .filter((nProd) => nProd.title.toLowerCase().includes(campoDeBusca))
+            .map((prod) => (
+              <span key={ prod.id }>
+                <CardProd
+                  titleProd={ prod.title }
+                  imageProd={ prod.thumbnail }
+                  priceProd={ prod.price }
+                />
+              </span>
+            ))
+        )}
+
       </div>
     );
   }
 }
+
+Home.propTypes = {
+  // Source: https://stackoverflow.com/questions/52109592/react-router-the-prop-history-is-undefined
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+};
