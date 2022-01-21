@@ -43,10 +43,17 @@ class Home extends React.Component {
 
     render() {
       const { categories,
-        loading, searchedItem, products, cartProducts, carregando } = this.state;
+        loading, searchedItem, products, cartProducts } = this.state;
       return (
         <div>
-          <Link data-testid="shopping-cart-button" to="/cart">About</Link>
+          <Link data-testid="shopping-cart-button" to="/cart">
+          <div>
+        <button 
+            type="submit">
+            Carrinho
+        </button>
+        </div>
+          </Link>
           <p data-testid="home-initial-message">
             Digite algum termo de pesquisa ou escolha uma categoria.
           </p>
