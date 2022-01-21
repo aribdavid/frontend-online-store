@@ -1,152 +1,89 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import CardProd from '../components/CardProd';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
+import ProductCard from '../components/ProductCard';
 
-export default class Home extends Component {
+class Home extends React.Component {
   constructor() {
     super();
-
     this.state = {
-      categoryList: [],
-      campoDeBusca: '',
-      notFoundProduct: false,
-      productList: [],
+      categories: [],
+      loading: true,
+      products: [],
+      searchedItem: '',
+      selectedCategory: '',
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.getProducts = this.getProducts.bind(this);
-    this.checkReturnAPI = this.checkReturnAPI.bind(this);
   }
 
   componentDidMount() {
-    getCategories().then((cat) => {
-      this.setState({
-        categoryList: cat,
-      });
-    });
+    getCategories().then((data) => this.setState({ categories: data, loading: false }));
   }
 
-  handleClick = (event) => {
-    event.preventDefault();
-    const { history } = this.props;
-    history.push('/ShoppingCart');
-  }
-
-  handleChange({ target }) {
-    this.setState({
-      [target.name]: target.value,
-    });
-  }
-
-  getProducts = async () => {
-    const { campoDeBusca } = this.state;
-
-    await getProductsFromCategoryAndQuery('$CATEGORY_ID', campoDeBusca)
-      .then((prod) => {
-        this.setState({
-          productList: prod,
-        });
-      });
-
-    this.checkReturnAPI();
-  }
-
-  checkReturnAPI() {
-    const { productList } = this.state;
-    if (productList.length === 0) {
-      this.setState({
-        notFoundProduct: true,
-      });
-    } else {
-      this.setState({
-        notFoundProduct: false,
-      });
+    listProducts = () => {
+      const { selectedCategory, searchedItem } = this.state;
+      getProductsFromCategoryAndQuery(selectedCategory, searchedItem)
+        .then((data) => this.setState({ products: data.results }));
     }
-  }
 
-  render() {
-    const { categoryList, campoDeBusca, notFoundProduct, productList } = this.state;
+    handleChange = ({ target: { value, name } }) => {
+      this.setState({ [name]: value });
+    }
 
-    return (
-      <div>
-        <h1 data-testid="home-initial-message">
-          Digite algum termo de pesquisa ou escolha uma
-          categoria.
+    handleChangeCategory = ({ target: { id, name } }) => {
+      this.setState({ [name]: id }, this.listProducts);
+    }
 
-        </h1>
-        <button
-          data-testid="shopping-cart-button"
-          type="submit"
-          onClick={ this.handleClick }
-        >
-          Carrinho de compras
-        </button>
-
-        <input
-          data-testid="query-input"
-          type="text"
-          name="campoDeBusca"
-          value={ campoDeBusca }
-          onChange={ this.handleChange }
-        />
-
-        <button
-          data-testid="query-button"
-          type="button"
-          onClick={ this.getProducts }
-        >
-          Buscar
-        </button>
-
+    render() {
+      const { categories, loading, searchedItem, products } = this.state;
+      return (
         <div>
-          <span>Categorias:</span>
-          {categoryList
-            .map((cat) => (
-              <ul key={ cat.id }>
-                {/* <button
-                      data-testid="category"
-                      type="button"
-                      name="btnCategory"
-                    >
-                      {cat.name}
-                    </button> */}
-                <label htmlFor="radioCategory">
-                  <input
-                    data-testid="category"
-                    type="radio"
-                    name="radioCategory"
-                    value={ cat.name }
-                  />
-                  { cat.name }
-                </label>
-              </ul>
-            ))}
-        </div>
-        {notFoundProduct ? (
-          <span>Nenhum produto foi encontrado</span>
-        ) : (
-          productList
-            .filter((nProd) => nProd.title.toLowerCase().includes(campoDeBusca))
-            .map((prod) => (
-              <span key={ prod.id }>
-                <CardProd
-                  titleProd={ prod.title }
-                  imageProd={ prod.thumbnail }
-                  priceProd={ prod.price }
-                />
-              </span>
-            ))
-        )}
+          <Link data-testid="shopping-cart-button" to="/cart">About</Link>
+          <p data-testid="home-initial-message">
+            Digite algum termo de pesquisa ou escolha uma categoria.
+          </p>
+          <input
+            data-testid="query-input"
+            type="search"
+            name="searchedItem"
+            onChange={ this.handleChange }
+            value={ searchedItem }
 
-      </div>
-    );
-  }
+          />
+          <button
+            data-testid="query-button"
+            type="button"
+            onClick={ this.listProducts }
+          >
+            Pesquisar
+          </button>
+          <ul>
+            {loading === false && categories.map((category) => (
+              <li key={ category.id }>
+                <label htmlFor={ category.id }>
+                  <input
+                    type="radio"
+                    data-testid="category"
+                    id={ category.id }
+                    name="selectedCategory"
+                    value={ category.id }
+                    onChange={ this.handleChangeCategory }
+                  />
+                  {category.name}
+                </label>
+              </li>
+            ))}
+          </ul>
+          {products.map((product) => (
+            <ProductCard
+              key={ product.id }
+              productName={ product.title }
+              productImg={ product.thumbnail }
+              productPrice={ product.price }
+            />
+          ))}
+        </div>
+      );
+    }
 }
 
-Home.propTypes = {
-  // Source: https://stackoverflow.com/questions/52109592/react-router-the-prop-history-is-undefined
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired,
-  }).isRequired,
-};
+export default Home;
