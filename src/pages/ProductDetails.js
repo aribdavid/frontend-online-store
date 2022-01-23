@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import { saveProductItem } from '../services/HandleLocalStorage';
 
 class ProductDetails extends React.Component {
   constructor() {
@@ -17,9 +19,27 @@ class ProductDetails extends React.Component {
   }
 
   render() {
-    const { productDetails: { title } } = this.state;
+    const { productDetails: { title }, productDetails } = this.state;
     return (
-      <p data-testid="product-detail-name">{title}</p>
+      <div>
+        <Link data-testid="shopping-cart-button" to="/cart">
+          <button
+            type="submit"
+          >
+            Carrinho
+          </button>
+
+        </Link>
+        <p data-testid="product-detail-name">{title}</p>
+        <button
+          data-testid="product-detail-add-to-cart"
+          type="button"
+          name={ title }
+          onClick={ () => (saveProductItem(productDetails)) }
+        >
+          Adicionar Ao Carrinho
+        </button>
+      </div>
     );
   }
 }

@@ -1,27 +1,40 @@
 import React from 'react';
+import { getProductItem } from '../services/HandleLocalStorage';
+import CartButtons from '../components/CartButtons';
 
 class ShoppingCart extends React.Component {
-  removeDuplicates = (array) => array.filter((elem, index) => array.indexOf(elem) === index);
+  constructor() {
+    super();
+    this.state = {
+      cartItems: [],
+      loading: true,
+    };
+  }
 
-   itemQuantity = (arr, val) => arr.reduce((counter, item) => (item === val ? counter + 1 : counter), 0);
+  componentDidMount() {
+    this.GetCartItems();
+  }
 
-   render() {
-     return (
-       <div>
-         Meus Produtos
-         {this.removeDuplicates(this.props.cartProducts).map((item) => (
-           <div key={ item }>
-             <p data-testid="shopping-cart-product-name">{item}</p>
-             <p data-testid="shopping-cart-product-quantity">
-               Quantidade:
-               {' '}
-               {this.itemQuantity(this.props.cartProducts, item)}
-             </p>
-           </div>
-         )) }
-       </div>
-     );
-   }
+  GetCartItems =() => {
+    const items = getProductItem();
+    this.setState({ cartItems: items, loading: false });
+  }
+
+  render() {
+    const { cartItems, loading } = this.state;
+    return (
+      <div>
+        {loading
+          ? <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
+          : cartItems.map((item) => (
+            <div key={ Math.random() }>
+              <button type="button">X</button>
+              <p data-testid="shopping-cart-product-name">{item.title}</p>
+              <CartButtons />
+            </div>))}
+      </div>
+    );
+  }
 }
 
 export default ShoppingCart;
