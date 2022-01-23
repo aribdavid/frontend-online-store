@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import ProductCard from '../components/ProductCard';
-import ShoppingCart from './ShoppingCart';
 
 class Home extends React.Component {
   constructor() {
@@ -13,19 +12,12 @@ class Home extends React.Component {
       products: [],
       searchedItem: '',
       selectedCategory: '',
-      cartProducts: [],
     };
   }
 
   componentDidMount() {
     getCategories().then((data) => this.setState({ categories: data, loading: false }));
   }
-
-  handleClick = ({ target }) => {
-    this.setState((prevState) => (
-      { cartProducts: [...prevState.cartProducts, target.name] }
-    ));
-  };
 
     listProducts = () => {
       const { selectedCategory, searchedItem } = this.state;
@@ -43,17 +35,9 @@ class Home extends React.Component {
 
     render() {
       const { categories,
-        loading, searchedItem, products, cartProducts } = this.state;
+        loading, searchedItem, products } = this.state;
       return (
         <div>
-          <Link data-testid="shopping-cart-button" to="/cart">
-          <div>
-        <button 
-            type="submit">
-            Carrinho
-        </button>
-        </div>
-          </Link>
           <p data-testid="home-initial-message">
             Digite algum termo de pesquisa ou escolha uma categoria.
           </p>
@@ -96,18 +80,18 @@ class Home extends React.Component {
                 productImg={ product.thumbnail }
                 productPrice={ product.price }
                 productId={ product.id }
+                product={ product }
               />
-              <button
-                type="button"
-                data-testid="product-add-to-cart"
-                name={ product.title }
-                onClick={ this.handleClick }
-              >
-                Adicionar Ao Carrinho
-              </button>
             </div>
           ))}
-          {cartProducts.length !== 0 ? <ShoppingCart cartProducts={ cartProducts } /> : <p>Seu Carrinho Está Vazio</p>}
+          <Link data-testid="shopping-cart-button" to="/cart">
+            <button
+              type="submit"
+            >
+              Carrinho
+            </button>
+
+          </Link>
         </div>
       );
     }
