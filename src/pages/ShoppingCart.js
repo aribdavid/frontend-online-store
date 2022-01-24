@@ -7,7 +7,6 @@ class ShoppingCart extends React.Component {
     super();
     this.state = {
       cartItems: [],
-      loading: true,
     };
   }
 
@@ -17,21 +16,25 @@ class ShoppingCart extends React.Component {
 
   GetCartItems =() => {
     const items = getProductItem();
-    this.setState({ cartItems: items, loading: false });
+    this.setState({ cartItems: items });
   }
 
   render() {
-    const { cartItems, loading } = this.state;
+    const { cartItems } = this.state;
     return (
       <div>
-        {loading
-          ? <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
-          : cartItems.map((item) => (
+        if(cartItems.length === 0)
+        <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
+        else
+        {
+          cartItems.map((item) => (
             <div key={ Math.random() }>
               <button type="button">X</button>
               <p data-testid="shopping-cart-product-name">{item.title}</p>
               <CartButtons />
-            </div>))}
+            </div>))
+        }
+
       </div>
     );
   }
