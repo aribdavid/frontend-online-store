@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { getProductItem } from '../services/HandleLocalStorage';
 import CartButtons from '../components/CartButtons';
 
@@ -34,7 +35,9 @@ class ShoppingCart extends React.Component {
               <CartButtons />
             </div>))
         }
-
+        <Link to="/checkout" data-testid="checkout-products">
+          <button type="button">Checkout</button>
+        </Link>
       </div>
     );
   }
