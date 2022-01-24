@@ -118,6 +118,14 @@ class ProductDetails extends React.Component {
             </div>
           ))}
         </div>
+        <Link to="/cart">
+          <button
+            type="submit"
+          >
+            Carrinho
+          </button>
+
+        </Link>
       </div>
     );
   }

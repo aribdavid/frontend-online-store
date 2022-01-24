@@ -4,6 +4,7 @@ import './App.css';
 import ShoppingCart from './pages/ShoppingCart';
 import Home from './pages/Home';
 import ProductDetails from './pages/ProductDetails';
+import Checkout from './pages/Checkout';
 
 class App extends React.Component {
   render() {
@@ -18,6 +19,7 @@ class App extends React.Component {
               <ProductDetails { ...propsRoute } />
             ) }
           />
+          <Route path="/checkout" component={ Checkout } />
         </Switch>
       </BrowserRouter>
     );
