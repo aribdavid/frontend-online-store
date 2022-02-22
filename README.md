@@ -33,7 +33,6 @@ Neste projeto foi criada uma versão simplificada, sem persistência no banco de
   * `git clone https://github.com/aribdavid/frontend-online-store`
   * Entre na pasta do repositório que você acabou de clonar:
     * `cd frontend-online-store`
-  * Vá para a branch do seu grupo, com `git checkout main-group-XX && git pull`, onde `XX` é o número do seu grupo. Exemplos: `main-group-1`, `main-group-22`.
 
 2. Instale as dependências e inicialize o projeto
   * Instale as dependências:
